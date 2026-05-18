@@ -47,7 +47,7 @@ pipeline {
             kubectl apply -f k8s/postgres.yml
 
             # Update the image tag to this build number
-            sed -i "s|docker.io/shaheerkj/k8s-webapp:latest|docker.io/shaheerkj/k8s-webapp:${BUILD_NUMBER}|g" k8s/deployment.yaml
+            sed -i "s|docker.io/shaheerkj/k8s-webapp:latest|docker.io/shaheerkj/k8s-webapp:${BUILD_NUMBER}|g" k8s/deployment.yml
 
             kubectl apply -f k8s/deployment.yml
             kubectl apply -f k8s/service.yml
