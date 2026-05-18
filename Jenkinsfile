@@ -16,25 +16,26 @@ pipeline {
             }
         }
         stage('Docker Image Creation') {
-    steps {
-        echo "Building Docker image..."
-        sh '''
-            docker build -t ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER} .
-            docker tag ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER} \
-                       ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
-        '''
-    }
-
-}
-stage('Push to DockerHub') {
-    steps {
-        echo "Pushing Docker image to DockerHub..."
-        sh '''
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER}
-            docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
-        '''
-    }
-}
+            steps {
+                echo "Building Docker image..."
+                dir('app') {
+                    sh '''
+                        docker build -t ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER} .
+                        docker tag ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER} \
+                                   ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
+                    '''
+                }
+            }
+        }
+        stage('Push to DockerHub') {
+            steps {
+                echo "Pushing Docker image to DockerHub..."
+                sh '''
+                    echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+                    docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER}
+                    docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
+                '''
+            }
+        }
     }
 }
