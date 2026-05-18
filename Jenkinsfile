@@ -39,5 +39,24 @@ pipeline {
                 }
             }
         }
+stage('Kubernetes Deployment') {
+    steps {
+        echo "Deploying to Kubernetes..."
+        sh '''
+            kubectl apply -f k8s/db-pvc.yaml
+            kubectl apply -f k8s/db-deployment.yml
+            kubectl apply -f k8s/db-service.yml
+            kubectl apply -f k8s/web-deployment-final.yml
+            kubectl apply -f k8s/web-service.yml
+            kubectl apply -f k8s/web-hpa.yml
+
+            echo "Waiting for postgres and web pods to be ready..."
+            kubectl rollout status deployment/postgres --timeout=300s
+            kubectl rollout status deployment/web --timeout=300s
+            kubectl get pods -o wide
+            kubectl get svc
+        '''
+    }
+}
     }
 }
