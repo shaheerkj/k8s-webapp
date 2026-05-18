@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-webapp
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: k8s-webapp
+  template:
+    metadata:
+      labels:
+        app: k8s-webapp
+    spec:
+      containers:
+        - name: k8s-webapp
+          image: docker.io/shaheerkj/k8s-webapp:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PGHOST
+              value: "postgres"
+            - name: PGUSER
+              value: "appuser"
+            - name: PGPASSWORD
+              value: "apppassword"
+            - name: PGDATABASE
+              value: "appdb"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
