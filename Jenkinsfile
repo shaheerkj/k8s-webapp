@@ -30,11 +30,13 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 echo "Pushing Docker image to DockerHub..."
-                sh '''
-                    echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-                    docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER}
-                    docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
-                '''
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh '''
+                        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:${BUILD_NUMBER}
+                        docker push ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/k8s-webapp:latest
+                    '''
+                }
             }
         }
     }
